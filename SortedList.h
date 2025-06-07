@@ -7,7 +7,30 @@ namespace mtm {
 
     template <typename T>
     class SortedList {
+    private:
+        class m_node;
+        Node* m_head;
+        Node* m_tail;
+
     public:
+
+        SortedList();
+
+        SortedList(const SortedList& other);
+
+        ~SortedList();
+
+        SortedList& operator=(const SortedList& other);
+
+        class ConstIterator;
+
+        ConstIterator begin() const;
+
+        ConstIterator end() const;
+
+
+
+
         /**
          *
          * the class should support the following public interface:
@@ -34,8 +57,31 @@ namespace mtm {
 
     };
 
+    template<typename T>
+    class SortedList<T>::m_node {
+    private:
+        T m_data;
+        m_node* m_next = nullptr;
+        m_node* m_prev = nullptr;
+    };
+
     template <class T>
     class SortedList<T>::ConstIterator {
+
+    private:
+        SortedList* m_SortedList;
+        int m_index;
+        ConstIterator(SortedList* Sortedlist, const int& index) : m_SortedList(Sortedlist), m_index(index) {} // private constructor
+        ConstIterator(const ConstIterator& other);
+        ConstIterator& operator=(const ConstIterator& other);
+        ~ConstIterator();
+
+    public:
+
+        T& operator*(); // unary operator
+        ConstIterator& operator++();
+        bool operator!=(const ConstIterator& other);
+
     /**
      * the class should support the following public interface:
      * if needed, use =defualt / =delete
@@ -53,5 +99,9 @@ namespace mtm {
      *
      */
     };
+
+
+
+
 }
 
