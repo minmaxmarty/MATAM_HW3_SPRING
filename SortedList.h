@@ -17,7 +17,7 @@ namespace mtm {
         unsigned int m_size;
 
         void clear(Node* headToDelete);
-        void copyList(Node* newHead, Node* newTail, const SortedList& other);
+        void copyList(Node *&newHead, Node *&newTail, const SortedList& other);
 
     public:
 
@@ -45,7 +45,7 @@ namespace mtm {
 
         SortedList &remove(const ConstIterator &givenIt);
 
-        unsigned int length() const;
+        int length() const;
 
         template <typename Function>
         SortedList filter(Function filterFunction) const;
@@ -160,7 +160,7 @@ namespace mtm {
 
         copyList(newHead, newTail, other);
 
-        clear();
+        clear(m_head);
 
         m_head = newHead;
         m_tail = newTail;
@@ -208,33 +208,33 @@ namespace mtm {
         if (victim == nullptr) {
             return *this;
         }
-        if (victim == m_head) {
-            m_head = victim->m_next;
+
+        Node* prev = victim->m_prev;
+        Node* next = victim->m_next;
+
+        if (prev != nullptr) {
+            prev->m_next = next;
         }
-        else if (victim == m_tail) {
-            m_tail = victim->m_prev;
+        else {
+            m_head = next;
         }
-        Node* victimNext = givenIt.m_currentNode->m_next;
-        Node* victimPrev = givenIt.m_currentNode->m_prev;
-        if (victimNext && victimPrev) {
-            victimPrev->m_next = victimNext;
-            victimNext->m_prev = victimPrev;
+
+        if (next != nullptr) {
+            next->m_prev = prev;
         }
-        else if (!(!victimNext && !victimPrev)) {
-            Node*& toLink = (victimNext) ? victimNext->m_prev : victimPrev->m_next;
-            toLink = nullptr;
+        else {
+            m_tail = prev;
         }
-        // clear victim pointers and delete
-        victim->m_next = nullptr;
-        victim->m_prev = nullptr;
+
         delete victim;
-        // update size
+
         m_size--;
+
         return *this;
     }
 
     template<typename T>
-    unsigned int SortedList<T>::length() const {
+    int SortedList<T>::length() const {
         return m_size;
     }
 
@@ -328,7 +328,7 @@ namespace mtm {
     }
 
     template<typename T>
-    void SortedList<T>::copyList(Node* newHead, Node* newTail, const SortedList& other) {
+    void SortedList<T>::copyList(Node *&newHead, Node *&newTail, const SortedList& other) {
         try {
             Node* prev = nullptr;
             for (ConstIterator It = other.begin(); It != other.end(); ++It) {
