@@ -8,14 +8,14 @@ void TaskManager::assignTask(const string &personName, const Task &task) {
     newTask.setId(m_newestTaskId++);
 
     Person* curPerson = findPerson(personName);
-    if (curPerson == nullptr) {
+    if (curPerson == nullptr) { // if the person doesn't exist, add the person
         curPerson = addPerson(personName);
     }
     curPerson->assignTask(newTask);
 }
 
 void TaskManager::completeTask(const string &personName) {
-    if (Person* curPerson = findPerson(personName)) {
+    if (Person* curPerson = findPerson(personName)) { // if the person exists...
         curPerson->completeTask();
     }
 }
@@ -74,7 +74,7 @@ Person* TaskManager::findPerson(const string &personName) {
 
 Person *TaskManager::addPerson(const string &personName) {
     if (m_numOfPersons >= MAX_PERSONS) {
-        throw std::runtime_error("Max Number of People Reached");
+        throw std::runtime_error("Max number of people reached");
     }
     m_personArray[m_numOfPersons++] = Person(personName);
 

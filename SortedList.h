@@ -153,15 +153,16 @@ namespace mtm {
         if (this == &other) { // if they are the same
             return *this;
         }
-
+        // initialize new head, tail and size
         Node* newHead = nullptr;
         Node* newTail = nullptr;
         unsigned int newSize = other.m_size;
 
-        copyList(newHead, newTail, other);
+        copyList(newHead, newTail, other); // copy the list into the new parameters
 
-        clear(m_head);
+        clear(m_head); // delete the old list
 
+        // make this the new list
         m_head = newHead;
         m_tail = newTail;
         m_size = newSize;
@@ -173,20 +174,20 @@ namespace mtm {
 
     template<typename T>
     SortedList<T> &SortedList<T>::insert(const T &newData) {
-        if (m_head == nullptr) {
+        if (m_head == nullptr) { // the list is empty
             m_head = m_tail = new Node(newData, nullptr, nullptr);
         }
-        else if (newData > m_head->m_data) {
+        else if (newData > m_head->m_data) { // insert into the first spot
             Node* newNode = new Node(newData, m_head, nullptr);
             m_head->m_prev = newNode;
             m_head = newNode;
         }
-        else if (!(newData > m_tail->m_data)) {
+        else if (!(newData > m_tail->m_data)) { // insert into the last spot
             Node* newNode = new Node(newData, nullptr, m_tail);
             m_tail->m_next = newNode;
             m_tail = newNode;
         }
-        else {
+        else { // find where to insert
             for (ConstIterator It = begin(); It != end(); ++It) {
                 if (!(newData > *It) && newData > It.m_currentNode->m_next->m_data) {
                     Node* newNode = new Node(newData, It.m_currentNode->m_next, It.m_currentNode);
@@ -211,23 +212,23 @@ namespace mtm {
 
         Node* prev = victim->m_prev;
         Node* next = victim->m_next;
-
+        // if prev exists connect it to the next;
         if (prev != nullptr) {
             prev->m_next = next;
-        }
+        } // if not, than it's the head
         else {
             m_head = next;
         }
-
+        // similarly to the prev logic
         if (next != nullptr) {
             next->m_prev = prev;
         }
         else {
             m_tail = prev;
         }
-
+        // delete what you want to remove
         delete victim;
-
+        // decrease size
         m_size--;
 
         return *this;
@@ -329,7 +330,7 @@ namespace mtm {
 
     template<typename T>
     void SortedList<T>::copyList(Node *&newHead, Node *&newTail, const SortedList& other) {
-        try {
+        try { // if an allocation fails
             Node* prev = nullptr;
             for (ConstIterator It = other.begin(); It != other.end(); ++It) {
                 Node* newNode = new Node(*It, nullptr, nullptr);
@@ -344,7 +345,7 @@ namespace mtm {
             }
             newTail = prev;
         }
-        catch (...) {
+        catch (...) { // delete what has been allocated so far
             clear(newHead);
             throw;
         }
