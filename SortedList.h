@@ -16,7 +16,8 @@ namespace mtm {
         Node* m_tail;
         unsigned int m_size;
 
-        void clear();
+        void clear(Node* headToDelete);
+        void copyList(Node* newHead, Node* newTail, const SortedList& other);
 
     public:
 
@@ -40,11 +41,11 @@ namespace mtm {
 
         // methods
 
-        void insert(const T& newData);
+        SortedList &insert(const T &newData);
 
-        void remove(const ConstIterator& givenIt);
+        SortedList &remove(const ConstIterator &givenIt);
 
-        int length() const;
+        unsigned int length() const;
 
         template <typename Function>
         SortedList filter(Function filterFunction) const;
@@ -89,6 +90,7 @@ namespace mtm {
 
         // constructor
         explicit Node(const T& data, Node* next = nullptr, Node* prev = nullptr);
+        ~Node() = default;
 
     };
 
@@ -136,24 +138,14 @@ namespace mtm {
 
     template<typename T>
     SortedList<T>::SortedList(const SortedList &other) : m_head(nullptr), m_tail(nullptr), m_size(other.m_size) {
-        Node* prev = nullptr;
-        for (ConstIterator It = other.begin(); It != other.end(); ++It) {
-            Node* newNode = new Node(*It, nullptr, nullptr);
-            if (m_head == nullptr) {
-                m_head = newNode;
-            }
-            else {
-                prev->m_next = newNode;
-                prev->m_next->m_prev = prev;
-            }
-            prev = newNode;
-        }
-        m_tail = prev;
+        copyList(m_head, m_tail, other);
     }
 
     template<typename T>
     SortedList<T>::~SortedList() {
-        clear();
+        clear(m_head);
+        m_head = nullptr;
+        m_tail = nullptr;
     }
 
     template <typename T>
@@ -166,21 +158,7 @@ namespace mtm {
         Node* newTail = nullptr;
         unsigned int newSize = other.m_size;
 
-        // TODO: make a helper for this
-        Node* prev = nullptr;
-        for (ConstIterator It = other.begin(); It != other.end(); ++It) {
-            Node* newNode = new Node(*It, nullptr, nullptr);
-            if (newHead == nullptr) {
-                newHead = newNode;
-            }
-            else {
-                prev->m_next = newNode;
-                prev->m_next->m_prev = prev;
-            }
-            prev = newNode;
-        }
-        newTail = prev;
-        // helper ends here
+        copyList(newHead, newTail, other);
 
         clear();
 
@@ -194,7 +172,7 @@ namespace mtm {
     // methods
 
     template<typename T>
-    void SortedList<T>::insert(const T& newData) {
+    SortedList<T> &SortedList<T>::insert(const T &newData) {
         if (m_head == nullptr) {
             m_head = m_tail = new Node(newData, nullptr, nullptr);
         }
@@ -220,13 +198,15 @@ namespace mtm {
         }
 
         m_size++;
+
+        return *this;
     }
 
     template<typename T>
-    void SortedList<T>::remove(const ConstIterator &givenIt) {
+    SortedList<T> &SortedList<T>::remove(const ConstIterator &givenIt) {
         Node* victim = givenIt.m_currentNode;
         if (victim == nullptr) {
-            return;
+            return *this;
         }
         if (victim == m_head) {
             m_head = victim->m_next;
@@ -236,25 +216,25 @@ namespace mtm {
         }
         Node* victimNext = givenIt.m_currentNode->m_next;
         Node* victimPrev = givenIt.m_currentNode->m_prev;
-
         if (victimNext && victimPrev) {
             victimPrev->m_next = victimNext;
             victimNext->m_prev = victimPrev;
         }
-
         else if (!(!victimNext && !victimPrev)) {
             Node*& toLink = (victimNext) ? victimNext->m_prev : victimPrev->m_next;
             toLink = nullptr;
         }
-
+        // clear victim pointers and delete
         victim->m_next = nullptr;
         victim->m_prev = nullptr;
         delete victim;
+        // update size
         m_size--;
+        return *this;
     }
 
     template<typename T>
-    int SortedList<T>::length() const {
+    unsigned int SortedList<T>::length() const {
         return m_size;
     }
 
@@ -312,7 +292,7 @@ namespace mtm {
     template <typename T>
     const T& SortedList<T>::ConstIterator::operator*() const {
         if (m_currentNode == nullptr) {
-            throw std::out_of_range("out of range"); // incase we are out of range
+            throw std::out_of_range("No data"); // incase we are out of range
         }
         return m_currentNode->m_data; // return the data inside the node that the iterator is pointing to
     }
@@ -320,7 +300,7 @@ namespace mtm {
     template <typename T>
     typename SortedList<T>::ConstIterator& SortedList<T>::ConstIterator::operator++() {
         if (m_currentNode == nullptr) {
-            throw std::out_of_range("out of range");
+            throw std::out_of_range("Out of range");
         }
         m_currentNode = m_currentNode->m_next;
         return *this;
@@ -334,23 +314,40 @@ namespace mtm {
     // ---------------------------------- Helper ---------------------------------- //
 
     template<typename T>
-    void SortedList<T>::clear() {
-        if (m_head == nullptr) {
+    void SortedList<T>::clear(Node* headToDelete) {
+        if (headToDelete == nullptr) {
             return;
         }
 
-        Node* cur = m_head;
+        Node* cur = headToDelete;
         while (cur) {
             Node* toDelete = cur;
             cur = cur->m_next;
             delete toDelete;
         }
-
-        m_head = nullptr;
-        m_tail = nullptr;
     }
 
-
-
+    template<typename T>
+    void SortedList<T>::copyList(Node* newHead, Node* newTail, const SortedList& other) {
+        try {
+            Node* prev = nullptr;
+            for (ConstIterator It = other.begin(); It != other.end(); ++It) {
+                Node* newNode = new Node(*It, nullptr, nullptr);
+                if (newHead == nullptr) {
+                    newHead = newNode;
+                }
+                else {
+                    prev->m_next = newNode;
+                    prev->m_next->m_prev = prev;
+                }
+                prev = newNode;
+            }
+            newTail = prev;
+        }
+        catch (...) {
+            clear(newHead);
+            throw;
+        }
+    }
 }
 
