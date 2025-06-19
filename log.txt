@@ -1,3 +1,50 @@
+* commit 59e0648152e0a899a2d8f6e33ab8fc7dd4e9f2ac
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 21:44:44 2025 +0300
+| 
+|     remove includes that are not needed
+| 
+|  SortedList.h | 3 ---
+|  1 file changed, 3 deletions(-)
+|   
+| * commit 553b145f84c7c706c90728529feaa79a21643642
+|/  Author: minmaxmarty <aregmkhitaryan@gmail.com>
+|   Date:   Thu Jun 19 21:34:35 2025 +0300
+|   
+|       create submission branch
+|   
+|    .gitignore           |   2 -
+|    .gitmodules          |   6 -
+|    CMakeLists.txt       |  12 --
+|    MatamGenericTester   |   1 -
+|    Person.cpp           |  51 -----
+|    Person.h             |  79 -------
+|    README.md            |   6 -
+|    Task.cpp             |  86 --------
+|    Task.h               | 115 ----------
+|    TaskManagerTest      | Bin 367488 -> 0 bytes
+|    TechnionMatam        |   1 -
+|    dry.docx             |   0
+|    hw3.pdf              | Bin 632447 -> 0 bytes
+|    main.cpp             | 531 -----------------------------------------------
+|    test_results.html    | 410 ------------------------------------
+|    tests/test1.expected |   3 -
+|    tests/test2.expected |   3 -
+|    tests/test3.expected |  30 ---
+|    tests/test4.expected |   3 -
+|    tests/test5.expected |   3 -
+|    tests/test6.expected |  15 --
+|    21 files changed, 1357 deletions(-)
+| 
+* commit 3599d16a810450476a5f78e83dc17668772da42a
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 21:31:23 2025 +0300
+| 
+|     add log.txt
+| 
+|  log.txt | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|  1 file changed, 100 insertions(+)
+| 
 * commit 3818122e0566be4ae7581a2c1bcf1193d318b7c0
 | Author: minmaxmarty <aregmkhitaryan@gmail.com>
 | Date:   Thu Jun 19 21:30:24 2025 +0300

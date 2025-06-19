@@ -1,10 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <random>
 #include <stdexcept>
-
-#include "SortedList.h"
 
 namespace mtm {
 
