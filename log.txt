@@ -1,0 +1,100 @@
+* commit 3818122e0566be4ae7581a2c1bcf1193d318b7c0
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 21:30:24 2025 +0300
+| 
+|     add dry.pdf
+| 
+|  TaskManagerTest | Bin 367488 -> 367488 bytes
+|  dry.docx        |   0
+|  dry.pdf         | Bin 0 -> 191133 bytes
+|  3 files changed, 0 insertions(+), 0 deletions(-)
+| 
+* commit df162480a54f47aba5313b210904eb1edae733f2
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 20:47:12 2025 +0300
+| 
+|     add more comments and pass tests
+| 
+|  .gitmodules        |   6 +
+|  MatamGenericTester |   1 +
+|  SortedList.h       |  29 ++--
+|  TaskManager.cpp    |   6 +-
+|  TaskManagerTest    | Bin 0 -> 367488 bytes
+|  TechnionMatam      |   1 +
+|  test_results.html  | 410 +++++++++++++++++++++++++++++++++++++++++++++++++++
+|  7 files changed, 436 insertions(+), 17 deletions(-)
+| 
+* commit 431d5d021082448fcc79743cceef76c3381ffb0c
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 20:34:53 2025 +0300
+| 
+|     change remove method
+|     
+|     more simple solution
+| 
+|  CMakeLists.txt | 10 +++++++---
+|  SortedList.h   | 42 +++++++++++++++++++++---------------------
+|  2 files changed, 28 insertions(+), 24 deletions(-)
+| 
+* commit abd1bc136f2e2e2a12f1c312a031fd9974c21bd7
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 20:06:33 2025 +0300
+| 
+|     add try catch to sortedList
+| 
+|  SortedList.h | 97 ++++++++++++++++++++++++++++------------------------------
+|  1 file changed, 47 insertions(+), 50 deletions(-)
+| 
+* commit 288935b5f8a8d179501055e286b90c5f04653d90
+| Author: minmaxmarty <aregmkhitaryan@gmail.com>
+| Date:   Thu Jun 19 19:03:14 2025 +0300
+| 
+|     add task manager and fix sortedlist
+| 
+|  SortedList.h    | 248 ++++++++++++++++++++++++++++++++++++++++++++++--------
+|  TaskManager.cpp | 101 ++++++++++++++++++++++
+|  TaskManager.h   |  12 ++-
+|  hw3.pdf         | Bin 0 -> 632447 bytes
+|  4 files changed, 327 insertions(+), 34 deletions(-)
+| 
+* commit 59e9c3297757b6418f775337b68c700c17bc588f
+| Author: Nimrod Allouche <nimrodal@campus.technion.ac.il>
+| Date:   Sun Jun 8 13:42:46 2025 +0300
+| 
+|     added changes to sortedlist
+| 
+|  SortedList.h | 281 +++++++++++++++++++++++++++++++++++----------------------
+|  1 file changed, 174 insertions(+), 107 deletions(-)
+| 
+* commit f8bf53b65e77dc92bb75581d6607f053f90e562a
+| Author: minmamxmarty <aregmkhitaryan@gmail.com>
+| Date:   Sat Jun 7 23:13:31 2025 +0300
+| 
+|     add declerations
+| 
+|  .gitignore     |  2 ++
+|  CMakeLists.txt |  8 ++++++++
+|  SortedList.h   | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+|  3 files changed, 60 insertions(+)
+| 
+* commit d574ed91189f2e4bd2f8869d7fe4ffc909f576ec
+  Author: Ron Raphaeli <102682845+ronraphaeli@users.noreply.github.com>
+  Date:   Tue Jun 3 19:16:50 2025 +0300
+  
+      Add files via upload
+  
+   Person.cpp           |  51 +++++
+   Person.h             |  79 ++++++++
+   README.md            |   6 +
+   SortedList.h         |  57 ++++++
+   Task.cpp             |  86 ++++++++
+   Task.h               | 115 +++++++++++
+   TaskManager.h        |  75 +++++++
+   main.cpp             | 531 +++++++++++++++++++++++++++++++++++++++++++++++++
+   tests/test1.expected |   3 +
+   tests/test2.expected |   3 +
+   tests/test3.expected |  30 +++
+   tests/test4.expected |   3 +
+   tests/test5.expected |   3 +
+   tests/test6.expected |  15 ++
+   14 files changed, 1057 insertions(+)
