@@ -4,15 +4,19 @@
 #include <random>
 #include <stdexcept>
 
+#include "SortedList.h"
+
 namespace mtm {
 
     template <typename T>
     class SortedList {
-    private:
-        class m_node;
-        m_node* m_head;
-        m_node* m_tail;
-        int m_size;
+        class Node;
+
+        Node* m_head;
+        Node* m_tail;
+        unsigned int m_size;
+
+        void clear();
 
     public:
 
@@ -36,15 +40,17 @@ namespace mtm {
 
         // methods
 
-        void insert(T newData);
+        void insert(const T& newData);
 
-        void remove(const ConstIterator& It);
+        void remove(const ConstIterator& givenIt);
 
-        unsigned int length() const;
+        int length() const;
 
-        SortedList filter(bool (*func)(T)) const;
+        template <typename Function>
+        SortedList filter(Function filterFunction) const;
 
-        SortedList apply(T (*func)(T)) const;
+        template <typename Function>
+        SortedList apply(Function applyFunction) const;
 
 
         /**
@@ -74,31 +80,32 @@ namespace mtm {
     };
 
     template<typename T>
-    class SortedList<T>::m_node {
-    private:
-        friend SortedList<T>;
+    class SortedList<T>::Node {
+        friend SortedList;
 
         T m_data;
-        m_node* m_next = nullptr;
-        m_node* m_prev = nullptr;
+        Node* m_next;
+        Node* m_prev;
+
+        // constructor
+        explicit Node(const T& data, Node* next = nullptr, Node* prev = nullptr);
+
     };
 
     template <class T>
     class SortedList<T>::ConstIterator {
+        friend SortedList;
 
-    private:
-        friend SortedList<T>;
-
-        SortedList* m_SortedList;
-        const m_node* m_currentNode;
+        Node* m_currentNode;
 
         // private constructors
-        ConstIterator(SortedList* sortedList, const m_node* node);
-        ConstIterator(const ConstIterator& other);
-        ConstIterator& operator=(const ConstIterator& other);
-        ~ConstIterator();
+        explicit ConstIterator(Node* node);
 
     public:
+
+        ConstIterator(const ConstIterator& other) = default;
+        ConstIterator& operator=(const ConstIterator& other) = default;
+        ~ConstIterator() = default;
 
         const T& operator*() const; // unary operator
         ConstIterator& operator++();
@@ -122,26 +129,183 @@ namespace mtm {
      */
     };
 
+    // ------------------------------- SortedList ------------------------------- //
 
+    template <typename T>
+    SortedList<T>::SortedList() : m_head(nullptr), m_tail(nullptr), m_size(0) {}
 
+    template<typename T>
+    SortedList<T>::SortedList(const SortedList &other) : m_head(nullptr), m_tail(nullptr), m_size(other.m_size) {
+        Node* prev = nullptr;
+        for (ConstIterator It = other.begin(); It != other.end(); ++It) {
+            Node* newNode = new Node(*It, nullptr, nullptr);
+            if (m_head == nullptr) {
+                m_head = newNode;
+            }
+            else {
+                prev->m_next = newNode;
+                prev->m_next->m_prev = prev;
+            }
+            prev = newNode;
+        }
+        m_tail = prev;
+    }
 
+    template<typename T>
+    SortedList<T>::~SortedList() {
+        clear();
+    }
 
-    // ---------------- Iterator ---------------- //
+    template <typename T>
+    SortedList<T>& SortedList<T>::operator=(const SortedList& other) {
+        if (this == &other) { // if they are the same
+            return *this;
+        }
+
+        Node* newHead = nullptr;
+        Node* newTail = nullptr;
+        unsigned int newSize = other.m_size;
+
+        // TODO: make a helper for this
+        Node* prev = nullptr;
+        for (ConstIterator It = other.begin(); It != other.end(); ++It) {
+            Node* newNode = new Node(*It, nullptr, nullptr);
+            if (newHead == nullptr) {
+                newHead = newNode;
+            }
+            else {
+                prev->m_next = newNode;
+                prev->m_next->m_prev = prev;
+            }
+            prev = newNode;
+        }
+        newTail = prev;
+        // helper ends here
+
+        clear();
+
+        m_head = newHead;
+        m_tail = newTail;
+        m_size = newSize;
+
+        return *this;
+    }
+
+    // methods
+
+    template<typename T>
+    void SortedList<T>::insert(const T& newData) {
+        if (m_head == nullptr) {
+            m_head = m_tail = new Node(newData, nullptr, nullptr);
+        }
+        else if (newData > m_head->m_data) {
+            Node* newNode = new Node(newData, m_head, nullptr);
+            m_head->m_prev = newNode;
+            m_head = newNode;
+        }
+        else if (!(newData > m_tail->m_data)) {
+            Node* newNode = new Node(newData, nullptr, m_tail);
+            m_tail->m_next = newNode;
+            m_tail = newNode;
+        }
+        else {
+            for (ConstIterator It = begin(); It != end(); ++It) {
+                if (!(newData > *It) && newData > It.m_currentNode->m_next->m_data) {
+                    Node* newNode = new Node(newData, It.m_currentNode->m_next, It.m_currentNode);
+                    It.m_currentNode->m_next = newNode;
+                    newNode->m_next->m_prev = newNode;
+                    break;
+                }
+            }
+        }
+
+        m_size++;
+    }
+
+    template<typename T>
+    void SortedList<T>::remove(const ConstIterator &givenIt) {
+        Node* victim = givenIt.m_currentNode;
+        if (victim == nullptr) {
+            return;
+        }
+        if (victim == m_head) {
+            m_head = victim->m_next;
+        }
+        else if (victim == m_tail) {
+            m_tail = victim->m_prev;
+        }
+        Node* victimNext = givenIt.m_currentNode->m_next;
+        Node* victimPrev = givenIt.m_currentNode->m_prev;
+
+        if (victimNext && victimPrev) {
+            victimPrev->m_next = victimNext;
+            victimNext->m_prev = victimPrev;
+        }
+
+        else if (!(!victimNext && !victimPrev)) {
+            Node*& toLink = (victimNext) ? victimNext->m_prev : victimPrev->m_next;
+            toLink = nullptr;
+        }
+
+        victim->m_next = nullptr;
+        victim->m_prev = nullptr;
+        delete victim;
+        m_size--;
+    }
+
+    template<typename T>
+    int SortedList<T>::length() const {
+        return m_size;
+    }
+
+    template<typename T>
+    template<typename Function>
+    SortedList<T> SortedList<T>::filter(Function filterFunction) const {
+        SortedList newList;
+        for (ConstIterator It = begin(); It != end(); ++It) {
+            if (filterFunction(*It)) {
+                newList.insert(*It);
+            }
+        }
+
+        return newList;
+    }
+
+    template<typename T>
+    template<typename Function>
+    SortedList<T> SortedList<T>::apply(Function applyFunction) const {
+        SortedList newList;
+        for (ConstIterator It = begin(); It != end(); ++It) {
+            Node* curNode = It.m_currentNode;
+            newList.insert(applyFunction(curNode->m_data));
+        }
+
+        return newList;
+    }
+
+    // methods for ConstIterator inside sortedList
+
+    template <typename T>
+    typename SortedList<T>::ConstIterator SortedList<T>::begin() const {
+        return ConstIterator(m_head);
+    }
+
+    template <typename T>
+    typename SortedList<T>::ConstIterator SortedList<T>::end() const {
+        return ConstIterator(nullptr);
+    }
+
+    // ---------------------------------- Node ---------------------------------- //
+
+    template <typename T>
+    SortedList<T>::Node::Node(const T& data, Node* next, Node* prev) : m_data(data), m_next(next), m_prev(prev) {}
+
+    // -------------------------------- Iterator -------------------------------- //
 
     // constructors
 
     template <typename T>
-    SortedList<T>::ConstIterator::ConstIterator(SortedList *sortedList, const m_node *node) : m_SortedList(sortedList),
-        m_currentNode(node) {}
-
-    template <typename T>
-    SortedList<T>::ConstIterator::ConstIterator(const ConstIterator& other) = default;
-
-    template<typename T>
-    typename SortedList<T>::ConstIterator & SortedList<T>::ConstIterator::operator=(const ConstIterator &other) = default;
-
-    template <typename T>
-    SortedList<T>::ConstIterator::~ConstIterator() = default;
+    SortedList<T>::ConstIterator::ConstIterator(Node *node) : m_currentNode(node) {}
 
     // operators
 
@@ -156,7 +320,7 @@ namespace mtm {
     template <typename T>
     typename SortedList<T>::ConstIterator& SortedList<T>::ConstIterator::operator++() {
         if (m_currentNode == nullptr) {
-            return std::out_of_range("out of range");
+            throw std::out_of_range("out of range");
         }
         m_currentNode = m_currentNode->m_next;
         return *this;
@@ -167,6 +331,24 @@ namespace mtm {
         return m_currentNode != other.m_currentNode;
     }
 
+    // ---------------------------------- Helper ---------------------------------- //
+
+    template<typename T>
+    void SortedList<T>::clear() {
+        if (m_head == nullptr) {
+            return;
+        }
+
+        Node* cur = m_head;
+        while (cur) {
+            Node* toDelete = cur;
+            cur = cur->m_next;
+            delete toDelete;
+        }
+
+        m_head = nullptr;
+        m_tail = nullptr;
+    }
 
 
 
